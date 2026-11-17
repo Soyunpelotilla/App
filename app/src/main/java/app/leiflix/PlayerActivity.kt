@@ -284,7 +284,7 @@ class PlayerActivity : AppCompatActivity() {
             if (topControls is LinearLayout) {
                 topControls.orientation = LinearLayout.HORIZONTAL
                 topControls.gravity = Gravity.CENTER_VERTICAL
-                topControls.setPadding(36, 20, 24, 16)
+                topControls.setPadding(56, 20, 24, 16)
             }
 
             if (channelName.isNotEmpty() || epgTitle.isNotEmpty()) {
