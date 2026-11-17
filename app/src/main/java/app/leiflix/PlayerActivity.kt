@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.util.Base64
 import android.view.Gravity
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
@@ -169,8 +170,14 @@ class PlayerActivity : AppCompatActivity() {
         playerView.keepScreenOn = true
         playerView.setShutterBackgroundColor(Color.BLACK) // shutter negro hasta que llegue el primer frame
 
+        // Mostrar solo topControls (título/EPG) al entrar, ocultar bottomControls
         playerView.controllerAutoShow = false
-        playerView.hideController()
+        playerView.post {
+            val bottomControls = playerView.findViewById<ViewGroup>(androidx.media3.ui.R.id.exo_bottom_controls)
+            bottomControls?.visibility = View.GONE
+            val topControls = playerView.findViewById<ViewGroup>(androidx.media3.ui.R.id.exo_top_controls)
+            topControls?.visibility = View.VISIBLE
+        }
 
         // ──────────────────────────────────────────────
         // INYECCIÓN DINÁMICA DE BOTONES (DLNA, Stop, Audio, Calidad)
@@ -342,6 +349,17 @@ class PlayerActivity : AppCompatActivity() {
                 topControls.addView(infoContainer)
             }
             // DLNA button now created in bottom controls section
+        }
+
+        // Touch listener: tap to show bottom controls
+        playerView.setOnTouchListener { v, event ->
+            if (event.action == MotionEvent.ACTION_UP) {
+                val bottomControls = playerView.findViewById<ViewGroup>(androidx.media3.ui.R.id.exo_bottom_controls)
+                if (bottomControls?.visibility == View.GONE) {
+                    bottomControls.visibility = View.VISIBLE
+                }
+            }
+            false
         }
 
         btnSettings.setOnClickListener { view ->

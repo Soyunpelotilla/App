@@ -12,6 +12,7 @@
         android:layout_height="match_parent"
         android:background="#000000"
         app:use_controller="true"
+        app:controller_layout_id="@layout/exo_player_view_custom"
         app:resize_mode="fit" />
 
 </FrameLayout>
