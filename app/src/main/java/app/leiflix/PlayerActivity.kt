@@ -178,7 +178,64 @@ class PlayerActivity : AppCompatActivity() {
         if (controlsContainer != null) {
             val settingsIdx = controlsContainer.indexOfChild(btnSettings)
 
-            // 1. DLNA (se inserta primero → queda más a la izquierda)
+            // Insertar en orden INVERSO para que visualmente queden: DLNA, Stop, Audio, Calidad
+            // 3. Audio (se inserta primero → queda más a la derecha, junto a Calidad)
+            if (controlsContainer.findViewById<View>(audioBtnId) == null) {
+                val btnAudio = ImageButton(this).apply {
+                    id = audioBtnId
+                    setImageResource(android.R.drawable.ic_btn_speak_now)
+                    background = btnSettings.background.constantState?.newDrawable()?.mutate()
+                    imageTintList = ColorStateList.valueOf(Color.WHITE)
+                    contentDescription = "Seleccionar Audio"
+                    scaleType = android.widget.ImageView.ScaleType.CENTER_INSIDE
+                    layoutParams = LinearLayout.LayoutParams(
+                        btnSettings.layoutParams.width,
+                        btnSettings.layoutParams.height
+                    )
+                    isFocusable = true
+                }
+                controlsContainer.addView(btnAudio, settingsIdx)
+
+                btnAudio.setOnClickListener { view ->
+                    view.isPressed = true
+                    btnSettings.isPressed = false
+
+                    player?.let { exoPlayer ->
+                        TrackSelectionDialogBuilder(this, "Seleccionar audio:", exoPlayer, C.TRACK_TYPE_AUDIO)
+                            .apply {
+                                setShowDisableOption(false)
+                                setAllowAdaptiveSelections(false)
+                            }.build().apply {
+                                setOnDismissListener { view.isPressed = false }
+                            }.show()
+                    }
+                }
+            }
+
+            // 2. Stop
+            if (controlsContainer.findViewById<View>(stopBtnId) == null) {
+                val btnStop = ImageButton(this).apply {
+                    id = stopBtnId
+                    setImageResource(R.drawable.ic_stop_white_24dp)
+                    background = btnSettings.background.constantState?.newDrawable()?.mutate()
+                    imageTintList = ColorStateList.valueOf(Color.WHITE)
+                    contentDescription = "Detener y salir"
+                    scaleType = android.widget.ImageView.ScaleType.CENTER_INSIDE
+                    layoutParams = LinearLayout.LayoutParams(
+                        btnSettings.layoutParams.width,
+                        btnSettings.layoutParams.height
+                    )
+                    isFocusable = true
+                }
+                controlsContainer.addView(btnStop, settingsIdx)
+
+                btnStop.setOnClickListener {
+                    releasePlayer()
+                    finish()
+                }
+            }
+
+            // 1. DLNA (se inserta último → queda más a la izquierda)
             if (controlsContainer.findViewById<View>(dlnaBtnId) == null) {
                 val btnDlna = ImageButton(this).apply {
                     id = dlnaBtnId
@@ -210,62 +267,6 @@ class PlayerActivity : AppCompatActivity() {
                         title = castTitle
                     ) {
                         player?.pause()
-                    }
-                }
-            }
-
-            // 2. Stop
-            if (controlsContainer.findViewById<View>(stopBtnId) == null) {
-                val btnStop = ImageButton(this).apply {
-                    id = stopBtnId
-                    setImageResource(R.drawable.ic_stop_white_24dp)
-                    background = btnSettings.background.constantState?.newDrawable()?.mutate()
-                    imageTintList = ColorStateList.valueOf(Color.WHITE)
-                    contentDescription = "Detener y salir"
-                    scaleType = android.widget.ImageView.ScaleType.CENTER_INSIDE
-                    layoutParams = LinearLayout.LayoutParams(
-                        btnSettings.layoutParams.width,
-                        btnSettings.layoutParams.height
-                    )
-                    isFocusable = true
-                }
-                controlsContainer.addView(btnStop, settingsIdx)
-
-                btnStop.setOnClickListener {
-                    releasePlayer()
-                    finish()
-                }
-            }
-
-            // 3. Audio
-            if (controlsContainer.findViewById<View>(audioBtnId) == null) {
-                val btnAudio = ImageButton(this).apply {
-                    id = audioBtnId
-                    setImageResource(android.R.drawable.ic_btn_speak_now)
-                    background = btnSettings.background.constantState?.newDrawable()?.mutate()
-                    imageTintList = ColorStateList.valueOf(Color.WHITE)
-                    contentDescription = "Seleccionar Audio"
-                    scaleType = android.widget.ImageView.ScaleType.CENTER_INSIDE
-                    layoutParams = LinearLayout.LayoutParams(
-                        btnSettings.layoutParams.width,
-                        btnSettings.layoutParams.height
-                    )
-                    isFocusable = true
-                }
-                controlsContainer.addView(btnAudio, settingsIdx)
-
-                btnAudio.setOnClickListener { view ->
-                    view.isPressed = true
-                    btnSettings.isPressed = false
-
-                    player?.let { exoPlayer ->
-                        TrackSelectionDialogBuilder(this, "Seleccionar audio:", exoPlayer, C.TRACK_TYPE_AUDIO)
-                            .apply {
-                                setShowDisableOption(false)
-                                setAllowAdaptiveSelections(false)
-                            }.build().apply {
-                                setOnDismissListener { view.isPressed = false }
-                            }.show()
                     }
                 }
             }
