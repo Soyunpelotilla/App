@@ -168,7 +168,6 @@ class PlayerActivity : AppCompatActivity() {
             .build()
 
         playerView.player = player
-        playerView.controllerAutoShow = false
         playerView.keepScreenOn = true
         playerView.setShutterBackgroundColor(Color.BLACK) // shutter negro hasta que llegue el primer frame
 
