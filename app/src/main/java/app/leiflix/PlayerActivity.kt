@@ -202,13 +202,13 @@ class PlayerActivity : AppCompatActivity() {
             tvEpg.visibility = View.VISIBLE
             playerView.showController()
             hideHandler.removeCallbacksAndMessages(null)
-            hideHandler.postDelayed({ hideAll() }, 3000)
+            hideHandler.postDelayed({ hideAll() }, 5000)
         }
 
         // Al entrar: SOLO título/EPG visible, controller oculto
         playerView.controllerAutoShow = false
         playerView.hideController()
-        hideHandler.postDelayed({ hideAll() }, 3000)
+        hideHandler.postDelayed({ hideAll() }, 5000)
 
         // Touch en PlayerView: muestra TODO (título/EPG + controller)
         playerView.setOnTouchListener { v, event ->
