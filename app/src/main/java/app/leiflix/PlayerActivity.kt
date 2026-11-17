@@ -190,15 +190,6 @@ class PlayerActivity : AppCompatActivity() {
 
         // Handler para ocultar todo (título/EPG + controller) tras 3s sin tocar
         val hideHandler = Handler(Looper.getMainLooper())
-        val hideRunnable = Runnable { hideAll() }
-
-        fun showAll() {
-            tvChannel.visibility = View.VISIBLE
-            tvEpg.visibility = View.VISIBLE
-            playerView.showController()
-            hideHandler.removeCallbacks(hideRunnable)
-            hideHandler.postDelayed(hideRunnable, 3000)
-        }
 
         fun hideAll() {
             tvChannel.visibility = View.GONE
@@ -206,10 +197,18 @@ class PlayerActivity : AppCompatActivity() {
             playerView.hideController()
         }
 
+        fun showAll() {
+            tvChannel.visibility = View.VISIBLE
+            tvEpg.visibility = View.VISIBLE
+            playerView.showController()
+            hideHandler.removeCallbacksAndMessages(null)
+            hideHandler.postDelayed({ hideAll() }, 3000)
+        }
+
         // Al entrar: SOLO título/EPG visible, controller oculto
         playerView.controllerAutoShow = false
         playerView.hideController()
-        hideHandler.postDelayed(hideRunnable, 3000)
+        hideHandler.postDelayed({ hideAll() }, 3000)
 
         // Touch en PlayerView: muestra TODO (título/EPG + controller)
         playerView.setOnTouchListener { v, event ->
