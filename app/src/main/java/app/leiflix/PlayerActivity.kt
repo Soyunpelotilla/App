@@ -171,6 +171,12 @@ class PlayerActivity : AppCompatActivity() {
         playerView.keepScreenOn = true
         playerView.setShutterBackgroundColor(Color.BLACK) // shutter negro hasta que llegue el primer frame
 
+        // Mostrar solo topControls (título/EPG) al entrar, ocultar bottomControls
+        playerView.post {
+            val bottomControls = playerView.findViewById<ViewGroup>(androidx.media3.ui.R.id.exo_bottom_controls)
+            bottomControls?.visibility = View.GONE
+        }
+
         // ──────────────────────────────────────────────
         // INYECCIÓN DINÁMICA DE BOTONES (DLNA, Stop, Audio, Calidad)
         // ──────────────────────────────────────────────
