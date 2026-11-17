@@ -52,9 +52,15 @@ class PlayerActivity : AppCompatActivity() {
             "Chrome/120.0.0.0 Safari/537.36"
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        // Ocultar barras ANTES de crear la vista para evitar flash/fade
+        window.addFlags(
+            WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or
+            WindowManager.LayoutParams.FLAG_FULLSCREEN or
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+        )
         window.setBackgroundDrawableResource(android.R.color.black)
+        
+        super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_player)
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
