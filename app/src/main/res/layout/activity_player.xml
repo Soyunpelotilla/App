@@ -6,7 +6,16 @@
     android:layout_height="match_parent"
     android:background="#000000">
 
-    <!-- Top info bar (title + EPG) - shown on entry -->
+    <!-- PlayerView with default controller -->
+    <androidx.media3.ui.PlayerView
+        android:id="@+id/player_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#000000"
+        app:use_controller="true"
+        app:resize_mode="fit" />
+
+    <!-- Top info bar (title + EPG) - shown on entry, drawn ON TOP of PlayerView -->
     <LinearLayout
         android:id="@+id/top_info_bar"
         android:layout_width="match_parent"
@@ -48,13 +57,4 @@
             android:shadowDy="2"
             android:shadowRadius="6" />
     </LinearLayout>
-
-    <!-- PlayerView with default controller -->
-    <androidx.media3.ui.PlayerView
-        android:id="@+id/player_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#000000"
-        app:use_controller="true"
-        app:resize_mode="fit" />
 </FrameLayout>
