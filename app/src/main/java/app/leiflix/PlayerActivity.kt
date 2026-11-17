@@ -8,7 +8,6 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Base64
-import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -46,7 +45,6 @@ class PlayerActivity : AppCompatActivity() {
     private val stopBtnId = View.generateViewId()
     private val audioBtnId = View.generateViewId()
     private val dlnaBtnId = View.generateViewId()
-    private val topInfoBarId = View.generateViewId()
 
     private val userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
             "AppleWebKit/537.36 (KHTML, like Gecko) " +
@@ -170,13 +168,34 @@ class PlayerActivity : AppCompatActivity() {
         playerView.keepScreenOn = true
         playerView.setShutterBackgroundColor(Color.BLACK) // shutter negro hasta que llegue el primer frame
 
-        // Mostrar solo topControls (título/EPG) al entrar, ocultar bottomControls
+        // Configurar título/EPG en el layout (no en PlayerView)
+        val tvChannel = findViewById<TextView>(R.id.tv_channel_name)
+        val tvEpg = findViewById<TextView>(R.id.tv_epg_title)
+        if (channelName.isNotEmpty()) {
+            tvChannel.text = channelName
+            tvChannel.isSelected = true
+            tvChannel.visibility = View.VISIBLE
+        } else {
+            tvChannel.visibility = View.GONE
+        }
+        if (epgTitle.isNotEmpty()) {
+            tvEpg.text = epgTitle
+            tvEpg.isSelected = true
+            tvEpg.visibility = View.VISIBLE
+        } else {
+            tvEpg.visibility = View.GONE
+        }
+
+        // Ocultar controller al entrar (solo título/EPG visible)
         playerView.controllerAutoShow = false
-        playerView.post {
-            val bottomControls = playerView.findViewById<ViewGroup>(androidx.media3.ui.R.id.exo_bottom_controls)
-            bottomControls?.visibility = View.GONE
-            val topControls = playerView.findViewById<ViewGroup>(androidx.media3.ui.R.id.exo_top_controls)
-            topControls?.visibility = View.VISIBLE
+        playerView.hideController()
+
+        // Touch en PlayerView: muestra controller
+        playerView.setOnTouchListener { v, event ->
+            if (event.action == MotionEvent.ACTION_UP) {
+                playerView.showController()
+            }
+            false
         }
 
         // ──────────────────────────────────────────────
@@ -282,84 +301,6 @@ class PlayerActivity : AppCompatActivity() {
                     }
                 }
             }
-        }
-
-        // ──────────────────────────────────────────────
-        // BARRA SUPERIOR (Nombre del canal + Programa EPG vigente)
-        // ──────────────────────────────────────────────
-        val topControls = playerView.findViewById<ViewGroup>(androidx.media3.ui.R.id.exo_top_controls)
-
-        if (topControls != null && topControls.findViewById<View>(dlnaBtnId) == null && btnSettings != null) {
-            (topControls.layoutParams as? FrameLayout.LayoutParams)?.apply {
-                width = FrameLayout.LayoutParams.MATCH_PARENT
-                gravity = Gravity.TOP
-            }
-            if (topControls is LinearLayout) {
-                topControls.orientation = LinearLayout.HORIZONTAL
-                topControls.gravity = Gravity.CENTER_VERTICAL
-                topControls.setPadding(60, 20, 24, 16)
-            }
-
-            if (channelName.isNotEmpty() || epgTitle.isNotEmpty()) {
-                val infoContainer = LinearLayout(this).apply {
-                    id = topInfoBarId
-                    orientation = LinearLayout.VERTICAL
-                    layoutParams = LinearLayout.LayoutParams(
-                        0,
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        1f
-                    ).apply {
-                        rightMargin = 24
-                    }
-                }
-
-                if (channelName.isNotEmpty()) {
-                    val tvChannel = TextView(this).apply {
-                        text = channelName
-                        setTextColor(Color.WHITE)
-                        textSize = 18f
-                        typeface = Typeface.DEFAULT_BOLD
-                        maxLines = 1
-                        ellipsize = TextUtils.TruncateAt.MARQUEE
-                        isSelected = true
-                        isFocusable = true
-                        isFocusableInTouchMode = true
-                        isSingleLine = true
-                        setShadowLayer(6f, 0f, 2f, Color.BLACK)
-                    }
-                    infoContainer.addView(tvChannel)
-                }
-
-                if (epgTitle.isNotEmpty()) {
-                    val tvEpg = TextView(this).apply {
-                        text = epgTitle
-                        setTextColor(Color.parseColor("#E0E0E0"))
-                        textSize = 14f
-                        maxLines = 1
-                        ellipsize = TextUtils.TruncateAt.MARQUEE
-                        isSelected = true
-                        isFocusable = true
-                        isFocusableInTouchMode = true
-                        isSingleLine = true
-                        setShadowLayer(6f, 0f, 2f, Color.BLACK)
-                    }
-                    infoContainer.addView(tvEpg)
-                }
-
-                topControls.addView(infoContainer)
-            }
-            // DLNA button now created in bottom controls section
-        }
-
-        // Touch listener: tap to show bottom controls
-        playerView.setOnTouchListener { v, event ->
-            if (event.action == MotionEvent.ACTION_UP) {
-                val bottomControls = playerView.findViewById<ViewGroup>(androidx.media3.ui.R.id.exo_bottom_controls)
-                if (bottomControls?.visibility == View.GONE) {
-                    bottomControls.visibility = View.VISIBLE
-                }
-            }
-            false
         }
 
         btnSettings.setOnClickListener { view ->
