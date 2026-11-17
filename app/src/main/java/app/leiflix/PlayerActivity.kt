@@ -64,9 +64,8 @@ class PlayerActivity : AppCompatActivity() {
         setContentView(R.layout.activity_player)
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        val insetsController = WindowInsetsControllerCompat(window, window.decorView)
-        insetsController.hide(WindowInsetsCompat.Type.systemBars())
-        insetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_NEVER
+        WindowInsetsControllerCompat(window, window.decorView)
+            .hide(WindowInsetsCompat.Type.systemBars())
 
         playerView = findViewById(R.id.player_view)
         initializePlayer()
@@ -170,13 +169,8 @@ class PlayerActivity : AppCompatActivity() {
         playerView.keepScreenOn = true
         playerView.setShutterBackgroundColor(Color.BLACK) // shutter negro hasta que llegue el primer frame
 
-        // Mostrar solo título/EPG al entrar: NO ocultar controller completo
         playerView.controllerAutoShow = false
-        // Ocultar bottom controls después de que se cree el controller
-        playerView.post {
-            val bottomControls = playerView.findViewById<ViewGroup>(androidx.media3.ui.R.id.exo_bottom_controls)
-            bottomControls?.visibility = View.GONE
-        }
+        playerView.hideController()
 
         // ──────────────────────────────────────────────
         // INYECCIÓN DINÁMICA DE BOTONES (DLNA, Stop, Audio, Calidad)
@@ -465,17 +459,15 @@ class PlayerActivity : AppCompatActivity() {
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus) {
-            val insetsController = WindowInsetsControllerCompat(window, window.decorView)
-            insetsController.hide(WindowInsetsCompat.Type.systemBars())
-            insetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_NEVER
+            WindowInsetsControllerCompat(window, window.decorView)
+                .hide(WindowInsetsCompat.Type.systemBars())
         }
     }
 
     override fun onResume() {
         super.onResume()
-        val insetsController = WindowInsetsControllerCompat(window, window.decorView)
-        insetsController.hide(WindowInsetsCompat.Type.systemBars())
-        insetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_NEVER
+        WindowInsetsControllerCompat(window, window.decorView)
+            .hide(WindowInsetsCompat.Type.systemBars())
         player?.play()
     }
 
