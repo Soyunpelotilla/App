@@ -6,6 +6,8 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.TextUtils
 import android.util.Base64
 import android.view.MotionEvent
@@ -186,14 +188,33 @@ class PlayerActivity : AppCompatActivity() {
             tvEpg.visibility = View.GONE
         }
 
-        // Ocultar controller al entrar (solo título/EPG visible)
+        // Handler para ocultar todo (título/EPG + controller) tras 3s sin tocar
+        val hideHandler = Handler(Looper.getMainLooper())
+        val hideRunnable = Runnable { hideAll() }
+
+        fun showAll() {
+            tvChannel.visibility = View.VISIBLE
+            tvEpg.visibility = View.VISIBLE
+            playerView.showController()
+            hideHandler.removeCallbacks(hideRunnable)
+            hideHandler.postDelayed(hideRunnable, 3000)
+        }
+
+        fun hideAll() {
+            tvChannel.visibility = View.GONE
+            tvEpg.visibility = View.GONE
+            playerView.hideController()
+        }
+
+        // Al entrar: SOLO título/EPG visible, controller oculto
         playerView.controllerAutoShow = false
         playerView.hideController()
+        hideHandler.postDelayed(hideRunnable, 3000)
 
-        // Touch en PlayerView: muestra controller
+        // Touch en PlayerView: muestra TODO (título/EPG + controller)
         playerView.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_UP) {
-                playerView.showController()
+                showAll()
             }
             false
         }
