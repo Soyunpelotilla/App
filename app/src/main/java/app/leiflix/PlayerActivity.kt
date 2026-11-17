@@ -73,9 +73,8 @@ class PlayerActivity : AppCompatActivity() {
         val topInfoBar = findViewById<ViewGroup>(R.id.top_info_bar)
         ViewCompat.setOnApplyWindowInsetsListener(topInfoBar) { view, insets ->
             val topInset = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()).top
-            if (topInset > 0) {
-                view.setPadding(view.paddingStart, topInset + 20, view.paddingEnd, view.paddingBottom)
-            }
+            // Base 12dp + inset extra si hay notch/overscan
+            view.setPadding(view.paddingStart, topInset + 12, view.paddingEnd, view.paddingBottom)
             insets
         }
 
