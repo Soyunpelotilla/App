@@ -171,6 +171,10 @@ class PlayerActivity : AppCompatActivity() {
         playerView.keepScreenOn = true
         playerView.setShutterBackgroundColor(Color.BLACK) // shutter negro hasta que llegue el primer frame
 
+        // Ocultar bottom controls al entrar (solo mostrar título/EPG)
+        playerView.controllerAutoShow = false
+        playerView.hideController()
+
         // ──────────────────────────────────────────────
         // INYECCIÓN DINÁMICA DE BOTONES (DLNA, Stop, Audio, Calidad)
         // ──────────────────────────────────────────────
@@ -289,7 +293,7 @@ class PlayerActivity : AppCompatActivity() {
             if (topControls is LinearLayout) {
                 topControls.orientation = LinearLayout.HORIZONTAL
                 topControls.gravity = Gravity.CENTER_VERTICAL
-                topControls.setPadding(40, 20, 24, 16)
+                topControls.setPadding(60, 20, 24, 16)
             }
 
             if (channelName.isNotEmpty() || epgTitle.isNotEmpty()) {
