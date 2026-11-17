@@ -311,7 +311,7 @@ class PlayerActivity : AppCompatActivity() {
                         isSelected = true
                         isFocusable = true
                         isFocusableInTouchMode = true
-                        singleLine = true
+                        isSingleLine = true
                         setShadowLayer(6f, 0f, 2f, Color.BLACK)
                     }
                     infoContainer.addView(tvChannel)
@@ -327,7 +327,7 @@ class PlayerActivity : AppCompatActivity() {
                         isSelected = true
                         isFocusable = true
                         isFocusableInTouchMode = true
-                        singleLine = true
+                        isSingleLine = true
                         setShadowLayer(6f, 0f, 2f, Color.BLACK)
                     }
                     infoContainer.addView(tvEpg)
