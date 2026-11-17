@@ -20,6 +20,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -67,6 +68,16 @@ class PlayerActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         WindowInsetsControllerCompat(window, window.decorView)
             .hide(WindowInsetsCompat.Type.systemBars())
+
+        // Ajustar top_info_bar para safe areas (TV, tablet, notch)
+        val topInfoBar = findViewById<ViewGroup>(R.id.top_info_bar)
+        ViewCompat.setOnApplyWindowInsetsListener(topInfoBar) { view, insets ->
+            val topInset = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout()).top
+            if (topInset > 0) {
+                view.setPadding(view.paddingStart, topInset + 20, view.paddingEnd, view.paddingBottom)
+            }
+            insets
+        }
 
         playerView = findViewById(R.id.player_view)
         initializePlayer()
