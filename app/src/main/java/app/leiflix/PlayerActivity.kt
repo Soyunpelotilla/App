@@ -10,6 +10,7 @@ import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
 import android.util.Base64
+import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -224,6 +225,24 @@ class PlayerActivity : AppCompatActivity() {
         playerView.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_UP) {
                 showAll()
+            }
+            false
+        }
+
+        // Key listener para TV/TV Box (DPAD_CENTER / ENTER / SPACE)
+        playerView.setOnKeyListener { v, keyCode, event ->
+            if (event.action == KeyEvent.ACTION_DOWN) {
+                when (keyCode) {
+                    KeyEvent.KEYCODE_DPAD_CENTER,
+                    KeyEvent.KEYCODE_ENTER,
+                    KeyEvent.KEYCODE_SPACE,
+                    KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE,
+                    KeyEvent.KEYCODE_MEDIA_PLAY,
+                    KeyEvent.KEYCODE_MEDIA_PAUSE -> {
+                        showAll()
+                        true
+                    }
+                }
             }
             false
         }
