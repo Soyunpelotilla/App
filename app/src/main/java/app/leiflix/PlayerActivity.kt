@@ -49,6 +49,9 @@ class PlayerActivity : AppCompatActivity() {
     private val stopBtnId = View.generateViewId()
     private val audioBtnId = View.generateViewId()
     private val dlnaBtnId = View.generateViewId()
+    private lateinit var tvChannel: TextView
+    private lateinit var tvEpg: TextView
+    private lateinit var hideHandler: Handler
 
     private val userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
             "AppleWebKit/537.36 (KHTML, like Gecko) " +
@@ -182,8 +185,8 @@ class PlayerActivity : AppCompatActivity() {
         playerView.setShutterBackgroundColor(Color.BLACK) // shutter negro hasta que llegue el primer frame
 
         // Configurar título/EPG en el layout (no en PlayerView)
-        val tvChannel = findViewById<TextView>(R.id.tv_channel_name)
-        val tvEpg = findViewById<TextView>(R.id.tv_epg_title)
+        tvChannel = findViewById(R.id.tv_channel_name)
+        tvEpg = findViewById(R.id.tv_epg_title)
         if (channelName.isNotEmpty()) {
             tvChannel.text = channelName
             tvChannel.isSelected = true
@@ -199,8 +202,8 @@ class PlayerActivity : AppCompatActivity() {
             tvEpg.visibility = View.GONE
         }
 
-        // Handler para ocultar todo (título/EPG + controller) tras 3s sin tocar
-        val hideHandler = Handler(Looper.getMainLooper())
+        // Handler para ocultar todo (título/EPG + controller) tras 5s sin tocar
+        hideHandler = Handler(Looper.getMainLooper())
 
         fun hideAll() {
             tvChannel.visibility = View.GONE
@@ -229,23 +232,7 @@ class PlayerActivity : AppCompatActivity() {
             false
         }
 
-        // Key listener para TV/TV Box (DPAD_CENTER / ENTER / SPACE)
-        playerView.setOnKeyListener { v, keyCode, event ->
-            if (event.action == KeyEvent.ACTION_DOWN) {
-                when (keyCode) {
-                    KeyEvent.KEYCODE_DPAD_CENTER,
-                    KeyEvent.KEYCODE_ENTER,
-                    KeyEvent.KEYCODE_SPACE,
-                    KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE,
-                    KeyEvent.KEYCODE_MEDIA_PLAY,
-                    KeyEvent.KEYCODE_MEDIA_PAUSE -> {
-                        showAll()
-                        true
-                    }
-                }
-            }
-            false
-        }
+        // Key events handled by Activity.onKeyDown() for TV remote support
 
         // ──────────────────────────────────────────────
         // INYECCIÓN DINÁMICA DE BOTONES (DLNA, Stop, Audio, Calidad)
@@ -492,6 +479,30 @@ class PlayerActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         releasePlayer()
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        when (keyCode) {
+            KeyEvent.KEYCODE_DPAD_CENTER,
+            KeyEvent.KEYCODE_ENTER,
+            KeyEvent.KEYCODE_SPACE,
+            KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE,
+            KeyEvent.KEYCODE_MEDIA_PLAY,
+            KeyEvent.KEYCODE_MEDIA_PAUSE -> {
+                // showAll uses class properties tvChannel, tvEpg, playerView, hideHandler
+                tvChannel.visibility = View.VISIBLE
+                tvEpg.visibility = View.VISIBLE
+                playerView.showController()
+                hideHandler.removeCallbacksAndMessages(null)
+                hideHandler.postDelayed({ 
+                    tvChannel.visibility = View.GONE
+                    tvEpg.visibility = View.GONE
+                    playerView.hideController()
+                }, 5000)
+                return true
+            }
+        }
+        return super.onKeyDown(keyCode, event)
     }
 
     private fun releasePlayer() {
