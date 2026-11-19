@@ -48,7 +48,6 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var playerView: PlayerView
     private val stopBtnId = View.generateViewId()
     private val audioBtnId = View.generateViewId()
-    private val dlnaBtnId = View.generateViewId()
     private lateinit var tvChannel: TextView
     private lateinit var tvEpg: TextView
     private lateinit var hideHandler: Handler
@@ -235,7 +234,7 @@ class PlayerActivity : AppCompatActivity() {
         // Key events handled by Activity.onKeyDown() for TV remote support
 
         // ──────────────────────────────────────────────
-        // INYECCIÓN DINÁMICA DE BOTONES (DLNA, Stop, Audio, Calidad)
+        // INYECCIÓN DINÁMICA DE BOTONES (Stop, Audio, Calidad)
         // ──────────────────────────────────────────────
         val btnSettings = playerView.findViewById<ImageButton>(androidx.media3.ui.R.id.exo_settings)
         btnSettings?.setImageResource(R.drawable.ic_hd_outline_24dp)
@@ -245,8 +244,8 @@ class PlayerActivity : AppCompatActivity() {
         if (controlsContainer != null) {
             val settingsIdx = controlsContainer.indexOfChild(btnSettings)
 
-            // Insertar en orden INVERSO para que visualmente queden: DLNA, Stop, Audio, Calidad
-            // 3. Audio (se inserta primero → queda más a la derecha, junto a Calidad)
+            // Insertar en orden INVERSO para que visualmente queden: Stop, Audio, Calidad
+            // 2. Audio (se inserta primero → queda más a la derecha, junto a Calidad)
             if (controlsContainer.findViewById<View>(audioBtnId) == null) {
                 val btnAudio = ImageButton(this).apply {
                     id = audioBtnId
@@ -279,7 +278,7 @@ class PlayerActivity : AppCompatActivity() {
                 }
             }
 
-            // 2. Stop
+            // 1. Stop
             if (controlsContainer.findViewById<View>(stopBtnId) == null) {
                 val btnStop = ImageButton(this).apply {
                     id = stopBtnId
@@ -299,42 +298,6 @@ class PlayerActivity : AppCompatActivity() {
                 btnStop.setOnClickListener {
                     releasePlayer()
                     finish()
-                }
-            }
-
-            // 1. DLNA (se inserta último → queda más a la izquierda)
-            if (controlsContainer.findViewById<View>(dlnaBtnId) == null) {
-                val btnDlna = ImageButton(this).apply {
-                    id = dlnaBtnId
-                    setImageResource(R.drawable.ic_cast_white_24dp)
-                    background = btnSettings.background.constantState?.newDrawable()?.mutate()
-                    imageTintList = ColorStateList.valueOf(Color.WHITE)
-                    contentDescription = "Transmitir por DLNA"
-                    scaleType = android.widget.ImageView.ScaleType.CENTER_INSIDE
-                    layoutParams = LinearLayout.LayoutParams(
-                        btnSettings.layoutParams.width,
-                        btnSettings.layoutParams.height
-                    )
-                    isFocusable = true
-                }
-                controlsContainer.addView(btnDlna, settingsIdx)
-
-                val castTitle = when {
-                    channelName.isNotEmpty() && epgTitle.isNotEmpty() -> "$channelName - $epgTitle"
-                    channelName.isNotEmpty() -> channelName
-                    else -> "LEIFLIX Live"
-                }
-
-                btnDlna.setOnClickListener {
-                    DlnaManager.showCastDialog(
-                        context = this@PlayerActivity,
-                        streamUrl = url,
-                        headers = headersCapturados,
-                        hasDrm = tieneDrm,
-                        title = castTitle
-                    ) {
-                        player?.pause()
-                    }
                 }
             }
         }
